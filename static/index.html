@@ -22,7 +22,7 @@
     "/>
     <script src="json2.js"></script>
   </head> 
-  <body bgcolor="white" height="100%" width="100%"> 
+  <body bgcolor="darkblue" height="100%" width="100%"> 
     <div id="debug"></div>
     <canvas id="c" width="100%" height="100%" style="-webkit-tap-highlight-color: transparent;"></canvas> 
 
@@ -36,6 +36,24 @@ var H = canvas.height = window.innerHeight-50;
 var wscounter = 0;
 var socket;
 
+var background = new Image();
+background.src = "WindowsXPHills.jpg";
+var img1 = new Image();
+img1.src = "FailedTaskSuccessfully.jpg";
+var img2 = new Image();
+img2.src = "Permissions.gif";
+var img3 = new Image();
+img3.src = "SystemUpdate.png";
+var image_dict = {
+    "img1": img1,
+    "img2": img2,
+    "img3": img3,
+};
+
+// Create 51 Audio elements to call when an new entity is recieved
+var audio_arr = [...Array(51)].map((_, i_) => new Audio('erro.mp3'));
+
+
 function debug(str) {
     var debugDiv = document.getElementById('debug');
     debugDiv.innerHTML = "" + str;
@@ -44,36 +62,31 @@ debug("Test");
 
 world = {};
 
-//XXX: TODO Make this prettier!
-function drawCircle(context,entity) {
+// Draw an image at the mouse location
+// reference: https://www.w3schools.com/tags/canvas_drawimage.asp
+function myDrawImage(context, entity) {
     with(context) {
-        beginPath();                
+        beginPath();              
         lineWidth = 3;
         var x = entity["x"];
         var y = entity["y"];
         //moveTo(x,y);
-        fillStyle = entity["colour"];
-        strokeStyle = fillStyle;
-        arc(x, y, (entity["radius"])?entity["radius"]:50, 0, 2.0 * Math.PI, false);  
-        stroke();                                
+        image_num = entity["img_num"];
+        drawImage(image_dict[image_num], x, y);                              
     }
 }
 
 function prepEntity(entity) {
-    if (!entity["colour"]) {
-        entity["colour"] = "#FF0000";
-    }
-    if (!entity["radius"]) {
-        entity["radius"] = 50;
+    if (!entity["img_num"]) {
+        entity["img_num"] = "img1";
     }
     return entity;
 }
 
 function clearFrame() {
     with(context) {
-	moveTo(0,0);
-	fillStyle = "#000";
-	fillRect(0,0,W,H);
+        moveTo(0,0);
+        drawImage(background,0,0);
     }
 
 }
@@ -83,7 +96,7 @@ function renderFrame() {
     clearFrame();
     for (var key in world) {
         var entity = world[key];
-        drawCircle(context,prepEntity(entity));
+        myDrawImage(context,prepEntity(entity));
     }
 }
 
@@ -123,7 +136,7 @@ function getPosition(e) {
 
 function addEntity(entity, data) {
     world[entity] = data;
-    drawNextFrame(); // (but should we?)
+    // drawNextFrame(); // (but should we? Dont need to)
     //XXX: Send a XHTML Request that updates the entity you just modified!
     let msg = {};
     msg[entity] = data;
@@ -234,16 +247,15 @@ mouse = (function() {
 // Add the application specific mouse listeners!
 //XXX: TODO Make these prettier!
 mouse.mousedowners.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'blue'});
+    addEntityWithoutName({'x':x-100,'y':y-50,'img_num':'img1'});
 });
 
 mouse.mouseuppers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'red'});
+    addEntityWithoutName({'x':x-100,'y':y-50,'img_num':'img3'});
 });
 
 mouse.mousedraggers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'green',
-                          'radius':10});
+    addEntityWithoutName({'x':x-100,'y':y-50,'img_num':'img2'});
 });
 
 
@@ -271,7 +283,11 @@ function wsSetup() {
             //XXX: TODO What are you going to do here?  
             const entitys = JSON.parse(msg.data);
             for (let key in entitys) {
+                let entity_num = parseInt(key.slice(1));
                 world[key] = entitys[key]
+                // Play error message for every second entity recieved
+                let audio_index = Math.floor(entity_num/2);
+                audio_arr[audio_index].play();
             }
             drawNextFrame();          
         } catch (e) {
@@ -292,3 +308,4 @@ setInterval( update, 1000/30.0);
     </script>
 </body>
 </html>
+

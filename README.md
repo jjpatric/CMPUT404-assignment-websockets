@@ -17,6 +17,11 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+WARNING
+=======
+There is audio included so make sure your volume is not too high when testing.
+
+
 Contributors / Licensing
 ========================
 
@@ -60,3 +65,23 @@ Contributors
 * Abram Hindle
 * Cole Mackenzie
 * jjpatric
+
+
+Image Sources:
+
+
+WindowsXPHills.jpg: https://getwallpapers.com/wallpaper/full/5/8/7/240255.jpg
+
+
+FailedTaskSuccessfully.jpg: https://i.imgur.com/bdx88D9.jpg
+
+
+SystemUpdate.png: https://stackoverflow.com/questions/10028962/vs2010-connection-dialog-gac-error-in-windows-xp
+
+
+Permissions.gif: https://www.reclaime.com/library/fix-access-denied.aspx
+
+
+Sound file Source:
+
+erro.mp3: https://www.myinstants.com/instant/windows-xp-error/
